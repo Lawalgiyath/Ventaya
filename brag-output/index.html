@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ventaya — Stop Motion Launch Video</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bone: #F5EFEB;
+      --bone-deep: #E8DFD8;
+      --ink: #141210;
+      --ink-muted: #5A544F;
+      --rose: #B83B3B;
+      --rose-soft: #F2DEDE;
+      --gold: #C28D42;
+      --green: #2E6B4F;
+      --paper-texture: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0D0C0A;
+      color: var(--bone);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 24px;
+    }
+
+    /* Video Frame Stage (16:9 ratio locked at 1280x720 or responsive scaling) */
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1120px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    #stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bone);
+      color: var(--ink);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Stop-motion grain & flicker overlay */
+    .grain-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+      background-image: 
+        radial-gradient(rgba(20, 18, 16, 0.05) 1px, transparent 0),
+        radial-gradient(rgba(20, 18, 16, 0.03) 1px, transparent 0);
+      background-size: 8px 8px, 12px 12px;
+      mix-blend-mode: multiply;
+      opacity: 0.85;
+    }
+
+    /* Stop-motion subtle mechanical jitter */
+    .stop-motion-jitter {
+      animation: jitter 0.12s steps(2) infinite;
+    }
+
+    @keyframes jitter {
+      0% { transform: translate(0px, 0px) rotate(0deg); }
+      25% { transform: translate(-0.8px, 0.5px) rotate(-0.15deg); }
+      50% { transform: translate(0.5px, -0.6px) rotate(0.1deg); }
+      75% { transform: translate(-0.4px, -0.4px) rotate(-0.08deg); }
+      100% { transform: translate(0.6px, 0.3px) rotate(0.12deg); }
+    }
+
+    /* Scene Container */
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6% 8%;
+      opacity: 0;
+      transition: opacity 0.08s steps(2);
+    }
+
+    .scene.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Typography */
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .headline-serif {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(2.4rem, 5.2vw, 4.8rem);
+      line-height: 0.96;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    .headline-serif em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .sub-lead {
+      font-size: clamp(0.95rem, 1.6vw, 1.4rem);
+      line-height: 1.4;
+      color: var(--ink-muted);
+      max-width: 680px;
+      margin-top: 14px;
+    }
+
+    /* Tactile Cards */
+    .paper-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--ink);
+      border-radius: 8px;
+      padding: clamp(14px, 2.2vw, 24px);
+      box-shadow: 4px 6px 0px var(--ink);
+      transition: transform 0.1s steps(2);
+    }
+
+    .stamp {
+      display: inline-block;
+      border: 2px solid var(--rose);
+      color: var(--rose);
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.65rem, 1vw, 0.85rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      transform: rotate(-1.5deg);
+    }
+
+    /* Scene Specific Themes */
+    .scene-dark {
+      background: #141210;
+      color: var(--bone);
+    }
+
+    .scene-dark .sub-lead {
+      color: #A39B94;
+    }
+
+    .scene-dark .paper-card {
+      background: #1F1C19;
+      border-color: #383430;
+      color: var(--bone);
+      box-shadow: 4px 6px 0px #000000;
+    }
+
+    /* Grid Layouts */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: clamp(16px, 3vw, 36px);
+      align-items: center;
+      margin-top: clamp(12px, 2vw, 24px);
+    }
+
+    .feature-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bone-deep);
+      border: 1px solid rgba(20, 18, 16, 0.2);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: clamp(0.7rem, 1vw, 0.85rem);
+      font-weight: 600;
+    }
+
+    .sarc-pill {
+      background: #FFFFFF;
+      border: 1px solid var(--ink);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: clamp(0.65rem, 0.9vw, 0.8rem);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    /* Bottom Control Bar */
+    .controls-bar {
+      margin-top: 18px;
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: #191715;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn {
+      background: var(--bone);
+      color: var(--ink);
+      border: none;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--rose);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: #D94848;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--rose);
+      border-radius: 4px;
+    }
+
+    .time-readout {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: #9C948D;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* Floating Status Indicator */
+    .rec-badge {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      z-index: 101;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+    }
+
+    .rec-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--rose);
+      border-radius: 50%;
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Title -->
+  <div style="text-align: center; margin-bottom: 14px;">
+    <p style="font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #8F8780; letter-spacing: 0.18em; text-transform: uppercase;">
+      Ventaya / Civic SGBV Reporting Lifeline
+    </p>
+    <h1 style="font-family: 'Cinzel', serif; font-size: 1.4rem; letter-spacing: 0.08em; color: var(--bone); margin-top: 4px;">
+      STOP-MOTION LAUNCH NARRATIVE
+    </h1>
+  </div>
+
+  <!-- Main Stage (16:9 1920x1080 Viewport) -->
+  <div class="stage-wrapper" id="stageWrapper">
+    <div id="stage" class="stop-motion-jitter">
+      
+      <div class="grain-overlay"></div>
+
+      <div class="rec-badge" id="recBadge">
+        <span class="rec-dot"></span>
+        <span id="timecodeDisplay">00:00 / 00:21</span>
+      </div>
+
+      <!-- ── SCENE 1: THE SILENCE (0.0s – 3.2s) ── -->
+      <div class="scene scene-dark active" id="scene1" data-start="0" data-end="3.4">
+        <div style="max-width: 860px;">
+          <div class="eyebrow" style="color: var(--rose);">
+            <span>NIGERIA / CIVIC IMPACT RECORD</span>
+          </div>
+          <h2 class="headline-serif" style="margin-top: 16px;">
+            Silence is <em>not consent.</em>
+          </h2>
+          <p class="sub-lead" style="font-size: clamp(1.1rem, 2.2vw, 1.8rem); color: #D1C8C0; margin-top: 18px;">
+            1 in 3 women face gender-based violence. Over 85% of cases go unreported due to fear, stigma, and retaliation.
+          </p>
+          <div style="margin-top: 28px; display: flex; gap: 14px; align-items: center;">
+            <span class="stamp">UNTIL TODAY</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 0.85rem; color: #9E968F;">
+              Building the safe ground our people deserve.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 2: SAFEREPORT & ANONYMITY (3.4s – 7.8s) ── -->
+      <div class="scene" id="scene2" data-start="3.4" data-end="7.8">
+        <div class="eyebrow" style="color: var(--ink);">
+          <span style="width: 8px; height: 8px; background: var(--rose); border-radius: 50%;"></span>
+          <span>SECTION 06 / SAFEREPORT NIGERIA</span>
+        </div>
+        
+        <div class="grid-2col">
+          <div>
+            <h2 class="headline-serif">
+              A quiet place <em>to speak.</em>
+            </h2>
+            <p class="sub-lead">
+              100% anonymous filing. No phone numbers. No emails. No public exposure.
+            </p>
+            <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px;">
+              <span class="feature-tag">Zero Trackers</span>
+              <span class="feature-tag">Cryptographic Storage</span>
+              <span class="feature-tag">72h Care Window</span>
+            </div>
+          </div>
+
+          <!-- UI Mockup Card -->
+          <div class="paper-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ECE4DE; padding-bottom: 10px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700;">CASE IDENTIFIER</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 0.85rem; background: var(--bone); padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+                VTY-9K2M4P
+              </span>
+            </div>
+            <div style="margin-top: 14px; font-size: 0.88rem;">
+              <p style="color: var(--ink-muted); font-size: 0.78rem;">INCIDENT TRIAGE</p>
+              <p style="font-weight: 700; margin-top: 2px;">Sexual Assault / Urgent Medical Need</p>
+            </div>
+            <div style="margin-top: 14px; background: var(--rose-soft); border: 1px solid rgba(184, 59, 59, 0.3); border-radius: 6px; padding: 10px;">
+              <p style="font-size: 0.78rem; font-weight: 700; color: var(--rose);">
+                CRITICAL 72-HOUR WINDOW
+              </p>
+              <p style="font-size: 0.75rem; color: var(--ink); margin-top: 2px;">
+                Direct emergency routing to accredited PEP and forensic support centers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 3: VERIFIED NIGERIAN SARCS (7.8s – 12.0s) ── -->
+      <div class="scene" id="scene3" data-start="7.8" data-end="12.0">
+        <div class="eyebrow" style="color: var(--rose);">
+          <span>DIRECT ACCREDITED CARE PIPELINE</span>
+        </div>
+        <h2 class="headline-serif" style="margin-top: 10px;">
+          Connected with <em>verified SARCs.</em>
+        </h2>
+        <p class="sub-lead">
+          Bridging the gap between the screen and immediate physical care across Nigeria.
+        </p>
+
+        <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+          <div class="sarc-pill">
+            <span style="color: var(--rose);">✦</span> Mirabel Centre (Lagos)
+          </div>
+          <div class="sarc-pill">
+            <span style="color: var(--rose);">✦</span> Cece Yara Foundation
+          </div>
+          <div class="sarc-pill">
+            <span style="color: var(--rose);">✦</span> WARIF Centre
+          </div>
+          <div class="sarc-pill">
+            <span style="color: var(--rose);">✦</span> Stand To End Rape (STER)
+          </div>
+          <div class="sarc-pill">
+            <span style="color: var(--rose);">✦</span> NAPTIP Response Team
+          </div>
+          <div class="sarc-pill">
+            <span style="color: var(--rose);">✦</span> National SOS Line: 112
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 18px; align-items: center;">
+          <span class="stamp">NO REPORT ABANDONED</span>
+          <span style="font-size: 0.85rem; color: var(--ink-muted);">
+            Immediate trauma guidance with zero judgment.
+          </span>
+        </div>
+      </div>
+
+      <!-- ── SCENE 4: DIRECT NGO PARTNERSHIPS (12.0s – 15.8s) ── -->
+      <div class="scene scene-dark" id="scene4" data-start="12.0" data-end="15.8">
+        <div class="eyebrow" style="color: var(--gold);">
+          <span>SECTION 07 / INSTITUTIONAL ALLIANCES</span>
+        </div>
+        <h2 class="headline-serif" style="margin-top: 12px;">
+          Calling women's rights <em>organizations & shelters.</em>
+        </h2>
+        <p class="sub-lead" style="color: #D1C8C0;">
+          Integrate directly with Ventaya to receive verified incident streams, coordinate emergency shelter admissions, and track survivor care without technical hurdles.
+        </p>
+
+        <div class="grid-2col" style="margin-top: 18px;">
+          <div class="paper-card">
+            <p style="font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #8F8780;">FOR FRONTLINE CARE NETWORKS</p>
+            <p style="font-size: 0.95rem; font-weight: 700; margin-top: 4px; color: var(--bone);">
+              Direct Case Management & Forensic Tracking
+            </p>
+            <p style="font-size: 0.8rem; color: #B3AAA2; margin-top: 4px;">
+              Equip your legal and medical caseworkers with encrypted intake tools.
+            </p>
+          </div>
+
+          <div style="background: rgba(194, 141, 66, 0.12); border: 1.5px solid var(--gold); border-radius: 8px; padding: 18px;">
+            <p style="font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700; color: var(--gold);">
+              PARTNER DIRECTLY WITH VENTAYA
+            </p>
+            <p style="font-size: 0.88rem; margin-top: 6px; color: var(--bone);">
+              Free for registered non-profit shelters, legal aid funds, and SGBV advocacy coalitions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 5: SEEKING GRANT FUNDING (15.8s – 18.8s) ── -->
+      <div class="scene" id="scene5" data-start="15.8" data-end="18.8">
+        <div class="eyebrow" style="color: var(--rose);">
+          <span>SECTION 08 / CIVIC RESILIENCE & SCALE</span>
+        </div>
+        <h2 class="headline-serif" style="margin-top: 12px;">
+          Seeking <em>grant funding</em> & impact partners.
+        </h2>
+        <p class="sub-lead">
+          Ventaya is built as public infrastructure. We are actively inviting philanthropic foundations, human rights donors, and civic technology funds to help us scale across all 36 Nigerian states.
+        </p>
+
+        <div style="margin-top: 22px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+          <div style="background: #FFFFFF; border: 1px solid var(--ink); padding: 14px 22px; border-radius: 8px; box-shadow: 3px 4px 0 var(--ink);">
+            <p style="font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--ink-muted);">IMPACT GOAL</p>
+            <p style="font-weight: 800; font-size: 1.1rem; margin-top: 2px;">Subsidized Zero-Cost Survivor Care</p>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid var(--ink); padding: 14px 22px; border-radius: 8px; box-shadow: 3px 4px 0 var(--ink);">
+            <p style="font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--ink-muted);">DATA FOR ADVOCACY</p>
+            <p style="font-weight: 800; font-size: 1.1rem; margin-top: 2px;">Anonymized Policy & Legislative Evidence</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 6: STAND WITH US / CALL TO ACTION (18.8s – 21.5s) ── -->
+      <div class="scene scene-dark" id="scene6" data-start="18.8" data-end="21.5" style="text-align: center; align-items: center;">
+        <span class="eyebrow" style="color: var(--rose);">THE MOVEMENT</span>
+        <h2 class="headline-serif" style="font-size: clamp(3rem, 6.5vw, 5.5rem); margin-top: 12px;">
+          VENTAYA
+        </h2>
+        <p style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(1.2rem, 2.4vw, 1.8rem); font-style: italic; color: #D1C8C0; margin-top: 6px;">
+          Dignity in every word. Justice in every step.
+        </p>
+
+        <!-- Direct Contact Badges -->
+        <div style="margin-top: 28px; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;">
+          <div style="background: #25D366; color: #FFFFFF; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-family: 'Space Mono', monospace; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+            <span>WhatsApp:</span> 08062679191
+          </div>
+          <div style="background: #FFFFFF; color: #141210; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-family: 'Space Mono', monospace; font-size: 0.88rem; display: flex; align-items: center; gap: 8px;">
+            <span>Email:</span> lawalgiyath200716@gmail.com
+          </div>
+        </div>
+
+        <p style="font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #9C948D; margin-top: 22px; letter-spacing: 0.1em;">
+          GITHUB: Lawalgiyath/Ventaya
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Interactive Controls Bar -->
+  <div class="controls-bar">
+    <button class="btn btn-primary" id="playBtn">
+      <span id="playIcon">▶</span> <span id="playText">Play Stop-Motion Video</span>
+    </button>
+    
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="time-readout" id="timeReadout">00:00 / 00:21</div>
+
+    <button class="btn" id="restartBtn">↺ Restart</button>
+  </div>
+
+  <!-- Audio Synthesizer & Video Engine Script -->
+  <script>
+    const DURATION = 21.5; // seconds
+    let isPlaying = false;
+    let currentTime = 0;
+    let animFrame = null;
+    let lastTimestamp = null;
+    let audioCtx = null;
+
+    const scenes = [
+      { id: 'scene1', start: 0.0, end: 3.4 },
+      { id: 'scene2', start: 3.4, end: 7.8 },
+      { id: 'scene3', start: 7.8, end: 12.0 },
+      { id: 'scene4', start: 12.0, end: 15.8 },
+      { id: 'scene5', start: 15.8, end: 18.8 },
+      { id: 'scene6', start: 18.8, end: 21.5 }
+    ];
+
+    const playBtn = document.getElementById('playBtn');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+    const restartBtn = document.getElementById('restartBtn');
+    const progressTrack = document.getElementById('progressTrack');
+    const progressFill = document.getElementById('progressFill');
+    const timeReadout = document.getElementById('timeReadout');
+    const timecodeDisplay = document.getElementById('timecodeDisplay');
+
+    // ── Web Audio Ambient Soundtrack & Shutter SFX ──
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playShutterClick() {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.06);
+      } catch (e) {}
+    }
+
+    function playWarmChord(freq) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 2.2);
+      } catch (e) {}
+    }
+
+    let lastSceneIndex = -1;
+
+    function renderTime(time) {
+      const pct = Math.min((time / DURATION) * 100, 100);
+      progressFill.style.width = pct + '%';
+
+      const currentSec = Math.floor(time);
+      const strCur = '00:' + (currentSec < 10 ? '0' + currentSec : currentSec);
+      timeReadout.textContent = strCur + ' / 00:21';
+      timecodeDisplay.textContent = strCur + ' / 00:21';
+
+      // Find active scene
+      let activeIndex = 0;
+      for (let i = 0; i < scenes.length; i++) {
+        if (time >= scenes[i].start && time < scenes[i].end) {
+          activeIndex = i;
+          break;
+        }
+      }
+
+      if (activeIndex !== lastSceneIndex) {
+        lastSceneIndex = activeIndex;
+        playShutterClick();
+        const chords = [146.83, 174.61, 220.00, 261.63, 293.66, 329.63]; // D minor warm harmony
+        playWarmChord(chords[activeIndex % chords.length]);
+      }
+
+      scenes.forEach((s, idx) => {
+        const el = document.getElementById(s.id);
+        if (idx === activeIndex) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+    }
+
+    function tick(timestamp) {
+      if (!isPlaying) return;
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      currentTime += delta;
+
+      if (currentTime >= DURATION) {
+        currentTime = DURATION;
+        renderTime(currentTime);
+        pause();
+        return;
+      }
+
+      renderTime(currentTime);
+      animFrame = requestAnimationFrame(tick);
+    }
+
+    function play() {
+      initAudio();
+      isPlaying = true;
+      lastTimestamp = null;
+      playIcon.textContent = '⏸';
+      playText.textContent = 'Pause';
+      if (currentTime >= DURATION) {
+        currentTime = 0;
+      }
+      animFrame = requestAnimationFrame(tick);
+    }
+
+    function pause() {
+      isPlaying = false;
+      playIcon.textContent = '▶';
+      playText.textContent = 'Play Video';
+      if (animFrame) cancelAnimationFrame(animFrame);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) pause();
+      else play();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      pause();
+      currentTime = 0;
+      lastSceneIndex = -1;
+      renderTime(0);
+      play();
+    });
+
+    progressTrack.addEventListener('click', (e) => {
+      const rect = progressTrack.getBoundingClientRect();
+      const clickPos = (e.clientX - rect.left) / rect.width;
+      currentTime = Math.max(0, Math.min(clickPos * DURATION, DURATION));
+      renderTime(currentTime);
+    });
+
+    // Initial render at 0
+    renderTime(0);
+  </script>
+</body>
+</html>

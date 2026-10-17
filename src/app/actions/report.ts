@@ -382,17 +382,21 @@ export async function getAnonymousStats(): Promise<StatsResult> {
     const stats: ReportStats = { total: 0, byType: {}, byState: {}, byUrgency: {}, recentCount: 0 };
 
     snap.docs.forEach((d) => {
-      const r = d.data() as Report;
+      const r = d.data() as Partial<Report>;
       stats.total++;
 
       // Only count reports from the last 30 days in recentCount
-      if (r.createdAt > cutoff) stats.recentCount++;
+      if (r.createdAt && r.createdAt > cutoff) stats.recentCount++;
 
-      stats.byType[r.incidentType] = (stats.byType[r.incidentType] ?? 0) + 1;
-      if (r.location.stateName) {
+      if (r.incidentType) {
+        stats.byType[r.incidentType] = (stats.byType[r.incidentType] ?? 0) + 1;
+      }
+      if (r.location?.stateName) {
         stats.byState[r.location.stateName] = (stats.byState[r.location.stateName] ?? 0) + 1;
       }
-      stats.byUrgency[r.urgency] = (stats.byUrgency[r.urgency] ?? 0) + 1;
+      if (r.urgency) {
+        stats.byUrgency[r.urgency] = (stats.byUrgency[r.urgency] ?? 0) + 1;
+      }
     });
 
     return { ok: true, stats };

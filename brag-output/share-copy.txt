@@ -1,0 +1,73 @@
+# Ventaya: Launch Copy & Distribution Templates
+
+Use these exact, high-converting messages across social media, partner networks, and direct donor communications.
+
+---
+
+### 1. Twitter / X Launch Thread
+
+**Post 1 (Hook):**
+In Nigeria, over 85% of gender-based violence cases go unreported due to fear, stigma, and retaliation.
+
+Today, we are launching Ventaya (SafeReport): a 100% anonymous, trauma-informed reporting lifeline connecting survivors to verified Nigerian SARCs in under 72 hours.
+
+Zero phone number required. Zero data leaks. Free forever.
+
+https://github.com/Lawalgiyath/Ventaya
+
+**Post 2 (The Product):**
+SafeReport generates a cryptographic Case ID (e.g. VTY-9K2M4P) that survivors can use to track medical triage, legal referrals, and forensic care without ever logging in or exposing their identity.
+
+Directly connected with verified care networks including Mirabel Centre, Cece Yara, WARIF, and Stand To End Rape.
+
+**Post 3 (The Ask):**
+We are actively seeking:
+1. Partnerships with Women’s Rights NGOs, shelters, and crisis care providers.
+2. Grant funding and philanthropic impact partners to scale infrastructure across all 36 Nigerian states.
+
+Direct outreach:
+WhatsApp: 08062679191 (https://wa.me/2348062679191)
+Email: lawalgiyath200716@gmail.com
+
+Join us in protecting our communities.
+
+---
+
+### 2. LinkedIn Announcement
+
+**Title:** Introducing Ventaya: Building Nigeria's Trauma-Informed Civic Reporting Lifeline
+
+In the critical 72-hour window following an incident of gender-based violence, survivors in Nigeria face overwhelming systemic barriers: fear of retaliation, social stigma, and difficulty navigating verified medical and forensic care.
+
+We built Ventaya to provide safe ground.
+
+With SafeReport, any survivor can file a completely anonymous report without an email, phone number, or login. The platform provides:
+- Instant trauma-informed crisis triage.
+- Automatic routing to verified Nigerian Sexual Assault Referral Centres (SARCs) like Mirabel Centre and WARIF.
+- An encrypted Case ID for tamper-proof case progression and evidence notes.
+- Emergency hotline routing (112, 0800 200 2020, 0800 073 3273).
+
+We are now opening direct collaboration channels:
+- Frontline NGOs & Shelters: We offer automated case routing and verified triage pipelines at zero cost.
+- Grant & Philanthropic Funders: We are seeking catalytic grant funding and impact capital to expand operational coverage across Nigeria.
+
+Connect with our team:
+WhatsApp: +234 806 267 9191
+Email: lawalgiyath200716@gmail.com
+Codebase & Documentation: https://github.com/Lawalgiyath/Ventaya
+
+---
+
+### 3. WhatsApp Direct Outreach (For NGOs & Funders)
+
+Hello. We are reaching out from the Ventaya Civic Safety Initiative.
+
+We have built a trauma-informed, 100% anonymous reporting and triage platform (SafeReport) designed specifically for survivors of sexual and gender-based violence in Nigeria.
+
+The platform connects survivors to verified Nigerian care centres (Mirabel Centre, WARIF, Cece Yara, NAPTIP) within the critical 72-hour medical window, with zero tracking and full cryptographic case security.
+
+We are currently onboarding women’s organizations and seeking grant partners to keep this lifeline entirely free across Nigeria.
+
+You can inspect the project at https://github.com/Lawalgiyath/Ventaya or reach us directly on WhatsApp at 08062679191 / email at lawalgiyath200716@gmail.com.
+
+Thank you for your tireless frontline work.

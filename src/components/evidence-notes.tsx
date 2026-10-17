@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Plus, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { FileText, Plus, ChevronDown, ChevronUp, Loader2, Check } from 'lucide-react';
 import { sendChatMessage } from '@/app/actions/report-chat';
 import { cn } from '@/lib/utils';
 
@@ -136,7 +136,10 @@ export function EvidenceNotes({ caseId }: Props) {
           )}
 
           {saved && (
-            <p className="text-xs text-primary font-medium">✓ Note saved to your case</p>
+            <p className="flex items-center gap-1.5 text-xs text-primary font-medium">
+              <Check className="h-3.5 w-3.5" />
+              Note saved to your case
+            </p>
           )}
 
           <div className="flex justify-between items-center">
