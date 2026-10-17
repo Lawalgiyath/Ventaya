@@ -334,6 +334,11 @@
       
       <div class="grain-overlay"></div>
 
+      <button class="rec-badge" id="audioToggleBtn" style="left: 22px; right: auto; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); z-index: 102;">
+        <span id="audioIcon">🔈</span>
+        <span id="audioStatus">Click for Sound</span>
+      </button>
+
       <div class="rec-badge" id="recBadge">
         <span class="rec-dot"></span>
         <span id="timecodeDisplay">00:00 / 00:21</span>
@@ -664,10 +669,8 @@
       currentTime += delta;
 
       if (currentTime >= DURATION) {
-        currentTime = DURATION;
-        renderTime(currentTime);
-        pause();
-        return;
+        currentTime = 0;
+        lastSceneIndex = -1;
       }
 
       renderTime(currentTime);
@@ -713,8 +716,33 @@
       renderTime(currentTime);
     });
 
-    // Initial render at 0
+    // Audio toggle
+    const audioToggleBtn = document.getElementById('audioToggleBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioStatus = document.getElementById('audioStatus');
+
+    function toggleAudio() {
+      initAudio();
+      if (audioCtx && audioCtx.state === 'running') {
+        audioIcon.textContent = '🔊';
+        audioStatus.textContent = 'Sound Active';
+        playShutterClick();
+      }
+    }
+
+    audioToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleAudio();
+    });
+
+    const stage = document.getElementById('stageWrapper');
+    stage.addEventListener('click', () => {
+      toggleAudio();
+    });
+
+    // Autoplay immediately on load
     renderTime(0);
+    play();
   </script>
 </body>
 </html>
