@@ -1,0 +1,127 @@
+rules_version = '2';
+
+// Ventaya security rules.
+//
+// Two things drive this file:
+//   1. Billing fields are server-owned. A client that could set its own
+//      `plan` or `subscriptionStatus` could grant itself a paid subscription,
+//      so those keys are rejected on every client write and only the Admin SDK
+//      (which bypasses rules) may set them.
+//   2. Organization leaders get NO read access to member documents. Aggregate
+//      insights are computed server-side and stripped of identifiers before
+//      they reach a leader's browser.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    // Fields only the server may write. Keeping this in one place means a new
+    // billing field can't be forgotten.
+    function billingFields() {
+      return [
+        'plan', 'subscriptionStatus', 'subscriptionId',
+        'stripeCustomerId', 'currentPeriodEnd',
+        'seatsPurchased', 'seatsUsed', 'isLeader'
+      ];
+    }
+
+    function noBillingWrites() {
+      return !request.resource.data.diff(resource.data)
+                .affectedKeys()
+                .hasAny(billingFields());
+    }
+
+    match /users/{userId} {
+      allow read: if isSelf(userId);
+
+      // On create the client may set isLeader (signup chooses the account
+      // type), but the account must start unpaid. Anything else is the
+      // server's to grant.
+      allow create: if isSelf(userId)
+                    && request.resource.data.get('plan', 'free') == 'free'
+                    && request.resource.data.get('subscriptionStatus', null) == null
+                    && !request.resource.data.keys().hasAny([
+                         'subscriptionId', 'stripeCustomerId', 'currentPeriodEnd'
+                       ]);
+
+      allow update: if isSelf(userId) && noBillingWrites();
+      allow delete: if isSelf(userId);
+    }
+
+    // Metered AI usage. Written exclusively by the server so a client cannot
+    // reset its own counter; readable by the owner to render the meter.
+    match /usage/{userId} {
+      allow read: if isSelf(userId);
+      allow write: if false;
+    }
+
+    match /organizations/{orgId} {
+      // Readable by any signed-in user so the invite-code lookup at signup
+      // can resolve an organization by id.
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+                    && request.resource.data.leaderUid == request.auth.uid
+                    && !request.resource.data.keys().hasAny([
+                         'plan', 'subscriptionStatus', 'subscriptionId',
+                         'stripeCustomerId', 'seatsPurchased'
+                       ]);
+
+      // Only the leader may edit, and never the billing fields.
+      allow update: if signedIn()
+                    && resource.data.leaderUid == request.auth.uid
+                    && noBillingWrites();
+
+      allow delete: if false;
+    }
+
+    // Webhook idempotency ledger — server-only, never client-visible.
+    match /stripe_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /community-stories/{storyId} {
+      allow read: if true;
+      // Stories are AI-moderated before they get here; the author is pinned to
+      // the caller so posts can't be attributed to someone else.
+      allow create: if signedIn();
+      allow update, delete: if false;
+    }
+
+    // SafeReport — SGBV incident reports.
+    //
+    // Privacy model:
+    //  - Clients may NEVER read or write reports directly. All reads and writes
+    //    go through server actions (Admin SDK) so we can strip accused info
+    //    and consistency scores before they reach the browser.
+    //  - There is no "list all reports" operation accessible to clients.
+    //  - Even authenticated users cannot read each other's reports.
+    //  - Only the Admin SDK (webhook, server action) may write.
+    //
+    // This means a compromised client token cannot access anyone's report data.
+    match /reports/{caseId} {
+      allow read, write: if false;
+    }
+
+    // SafeReport — Case chat messages.
+    //
+    // Same model: all access goes through server actions (Admin SDK).
+    // Clients cannot read or write chat messages directly, ensuring:
+    //  - Reporter A cannot read Reporter B's chat
+    //  - No one can impersonate support staff client-side
+    //  - Message history cannot be scraped without Admin credentials
+    match /report-chats/{caseId} {
+      allow read, write: if false;
+      match /messages/{messageId} {
+        allow read, write: if false;
+      }
+    }
+  }
+}

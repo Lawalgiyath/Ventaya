@@ -1,0 +1,45 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "caseId",      "order": "ASCENDING" },
+        { "fieldPath": "createdAtTs", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "consentToDataUse", "order": "ASCENDING" },
+        { "fieldPath": "createdAtTs",      "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status",      "order": "ASCENDING" },
+        { "fieldPath": "urgency",     "order": "ASCENDING" },
+        { "fieldPath": "createdAtTs", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "reporterUid", "order": "ASCENDING" },
+        { "fieldPath": "createdAtTs", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "_rate_limits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "windowStart", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,361 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Ventaya: editorial system
+
+   Deliberately NOT the default: no indigo, no Inter, no bento grid, no
+   glassmorphism, no radial "aura" gradients. The language here is print ,
+   hairline rules, oversized numerals, a didone display face, asymmetric
+   columns, full-bleed photography, and paper that has texture.
+
+   Four colours, the discipline luxury houses use: ink, bone, rose, oxblood.
+--------------------------------------------------------------------------- */
+
+@layer base {
+  :root {
+    /* Bone: warm paper, never white */
+    --background: 36 38% 94%;
+    --foreground: 345 18% 10%;
+
+    /* Ink: warm near-black, tinted toward the rose so it never reads blue */
+    --ink: 345 18% 10%;
+    --bone: 36 38% 94%;
+    --bone-deep: 34 30% 89%;
+
+    /* Rose: the house colour */
+    --primary: 348 83% 61%;
+    --primary-foreground: 36 40% 97%;
+
+    /* Oxblood: the deep anchor that keeps the rose from turning sweet */
+    --oxblood: 345 52% 20%;
+    --oxblood-foreground: 36 40% 96%;
+
+    --card: 36 40% 97%;
+    --card-foreground: 345 18% 10%;
+    --popover: 36 40% 97%;
+    --popover-foreground: 345 18% 10%;
+
+    --secondary: 34 30% 89%;
+    --secondary-foreground: 345 30% 18%;
+
+    --muted: 34 26% 88%;
+    --muted-foreground: 345 8% 40%;
+
+    --accent: 348 60% 92%;
+    --accent-foreground: 345 52% 22%;
+
+    --destructive: 4 74% 48%;
+    --destructive-foreground: 36 40% 97%;
+
+    --border: 345 12% 82%;
+    --input: 345 12% 82%;
+    --ring: 348 83% 61%;
+
+    /* Charts: rose family stepped against the oxblood, plus two neutrals */
+    --chart-1: 348 83% 61%;
+    --chart-2: 345 52% 30%;
+    --chart-3: 18 70% 62%;
+    --chart-4: 345 25% 55%;
+    --chart-5: 40 30% 70%;
+
+    /* Rounding is intentional per element, not one global radius. */
+    --radius: 0.4rem;
+
+    --sidebar-background: 36 40% 97%;
+    --sidebar-foreground: 345 18% 10%;
+    --sidebar-primary: 348 83% 61%;
+    --sidebar-primary-foreground: 36 40% 97%;
+    --sidebar-accent: 34 30% 91%;
+    --sidebar-accent-foreground: 345 30% 18%;
+    --sidebar-border: 345 12% 84%;
+    --sidebar-ring: 348 83% 61%;
+  }
+
+  .dark {
+    --background: 345 20% 7%;
+    --foreground: 36 30% 93%;
+
+    --ink: 36 30% 93%;
+    --bone: 345 20% 7%;
+    --bone-deep: 345 18% 11%;
+
+    --primary: 348 83% 64%;
+    --primary-foreground: 345 30% 8%;
+
+    --oxblood: 348 45% 26%;
+    --oxblood-foreground: 36 35% 94%;
+
+    --card: 345 18% 10%;
+    --card-foreground: 36 30% 93%;
+    --popover: 345 18% 10%;
+    --popover-foreground: 36 30% 93%;
+
+    --secondary: 345 15% 15%;
+    --secondary-foreground: 36 30% 93%;
+
+    --muted: 345 14% 14%;
+    --muted-foreground: 36 12% 62%;
+
+    --accent: 348 30% 20%;
+    --accent-foreground: 36 35% 94%;
+
+    --destructive: 4 70% 52%;
+    --destructive-foreground: 36 40% 97%;
+
+    --border: 345 12% 20%;
+    --input: 345 12% 20%;
+    --ring: 348 83% 64%;
+
+    --chart-1: 348 83% 64%;
+    --chart-2: 348 45% 45%;
+    --chart-3: 18 70% 60%;
+    --chart-4: 345 22% 62%;
+    --chart-5: 40 25% 62%;
+
+    --sidebar-background: 345 20% 8%;
+    --sidebar-foreground: 36 30% 93%;
+    --sidebar-primary: 348 83% 64%;
+    --sidebar-primary-foreground: 345 30% 8%;
+    --sidebar-accent: 345 15% 14%;
+    --sidebar-accent-foreground: 36 30% 93%;
+    --sidebar-border: 345 12% 18%;
+    --sidebar-ring: 348 83% 64%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Didone display wants tight tracking and optical sizing. */
+  h1, h2, h3 {
+    @apply font-headline;
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 3px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* --- Paper -----------------------------------------------------------
+     Backgrounds are printed textures, not gradients: letterpress grain, a
+     halftone dot field, and a fine rule grid. */
+
+  .paper {
+    position: relative;
+  }
+  .paper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+  }
+  .dark .paper::after {
+    mix-blend-mode: screen;
+    opacity: 0.28;
+  }
+
+  /* Halftone dot field: the rose screened back, like a printed tint. */
+  .halftone {
+    background-image: radial-gradient(
+      hsl(var(--primary) / 0.5) 1px,
+      transparent 1.15px
+    );
+    background-size: 9px 9px;
+  }
+
+  /* Engineering-drawing rule grid. */
+  .ruled {
+    background-image:
+      linear-gradient(to right, hsl(var(--foreground) / 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground) / 0.055) 1px, transparent 1px);
+    background-size: 76px 76px;
+  }
+
+  /* Diagonal barber stripe, used sparingly on accent blocks. */
+  .stripe {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      hsl(var(--primary) / 0.13) 0 6px,
+      transparent 6px 13px
+    );
+  }
+
+  /* --- Shapes ----------------------------------------------------------
+     Rounding is a decision per element. Arches for portraits, pills for
+     controls, hard corners for editorial blocks. */
+
+  /* A full dome only works on a tall, narrow element. */
+  .arch {
+    border-radius: 999px 999px 12px 12px;
+    overflow: hidden;
+  }
+  /* Wide elements need a bounded radius or the dome swallows the subject. */
+  .arch-wide {
+    border-radius: 15rem 15rem 0.75rem 0.75rem;
+    overflow: hidden;
+  }
+  .arch-down {
+    border-radius: 12px 12px 999px 999px;
+    overflow: hidden;
+  }
+  /* Asymmetric "leaf": bounded so it stays a shape and not a blob. */
+  .leaf {
+    border-radius: 7rem 1.25rem 7rem 1.25rem;
+    overflow: hidden;
+  }
+  .leaf-sm {
+    border-radius: 3.5rem 1rem 3.5rem 1rem;
+    overflow: hidden;
+  }
+  .pill {
+    border-radius: 999px;
+  }
+
+  /* --- Editorial furniture --------------------------------------------- */
+
+  /* Small caps label with wide tracking, sat on a hairline. */
+  .eyebrow {
+    @apply font-body text-[0.68rem] font-semibold uppercase;
+    letter-spacing: 0.22em;
+  }
+
+  /* Oversized ghost numeral for numbered sections. */
+  .numeral {
+    @apply font-headline leading-none;
+    font-size: clamp(4rem, 11vw, 9rem);
+    color: transparent;
+    -webkit-text-stroke: 1px hsl(var(--foreground) / 0.22);
+  }
+
+  .rule {
+    border-top: 1px solid hsl(var(--foreground) / 0.16);
+  }
+
+  /* Drop cap for the one paragraph that earns it. */
+  .dropcap::first-letter {
+    @apply font-headline;
+    float: left;
+    font-size: 3.9em;
+    line-height: 0.78;
+    padding: 0.06em 0.1em 0 0;
+    color: hsl(var(--primary));
+  }
+
+  /* Link that wipes in an underline from the left. */
+  .link-wipe {
+    background-image: linear-gradient(hsl(var(--primary)), hsl(var(--primary)));
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: left 100%;
+    transition: background-size 0.35s cubic-bezier(0.4, 0, 0.1, 1);
+  }
+  .link-wipe:hover {
+    background-size: 100% 1px;
+  }
+}
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 46s linear infinite;
+  }
+  .animate-marquee-slow {
+    animation: marquee 78s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee-paused:hover .animate-marquee,
+  .marquee-paused:hover .animate-marquee-slow {
+    animation-play-state: paused;
+  }
+
+  .animate-rise {
+    animation: rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-breathe {
+    animation: breathe 7s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50%      { transform: scale(1.07); opacity: 1; }
+  }
+
+  /* Slow rotation for the circular "seal" type. */
+  .animate-seal {
+    animation: seal 26s linear infinite;
+  }
+  @keyframes seal {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
+}
+
+/* --- Custom cursor ---------------------------------------------------------
+   Only applied once the Cursor component confirms a fine pointer and that
+   reduced motion is not requested, so touch and accessibility users keep the
+   native cursor. */
+@layer components {
+  .has-custom-cursor,
+  .has-custom-cursor a,
+  .has-custom-cursor button,
+  .has-custom-cursor [role='button'] {
+    cursor: none;
+  }
+
+  .ventaya-cursor-ring {
+    margin-left: -18px;
+    margin-top: -18px;
+    transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.28s ease,
+                border-color 0.28s ease;
+  }
+  .ventaya-cursor-ring.is-active {
+    width: 3.4rem;
+    height: 3.4rem;
+    margin-left: -27px;
+    margin-top: -27px;
+    background-color: hsl(var(--primary) / 0.13);
+    border-color: hsl(var(--primary));
+  }
+}
