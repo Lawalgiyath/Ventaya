@@ -4,7 +4,7 @@
 import type { PersonalizedContentOutput } from '@/ai/flows/personalized-content';
 import type { MentalHealthAssessmentOutput } from '@/ai/flows/mental-health-assessment';
 import React, { createContext, useState, useContext, ReactNode, useMemo, useEffect, useCallback } from 'react';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, type User as FirebaseUser, GoogleAuthProvider, signInWithPopup, signInAnonymously } from 'firebase/auth';
 import { doc, setDoc, onSnapshot, getDoc, collection, addDoc, serverTimestamp, getDocs, query, where, limit } from 'firebase/firestore';
 import { DailyPlannerOutput } from '@/ai/flows/daily-planner-flow';
@@ -210,6 +210,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       unsubOrg?.();
       unsubOrg = null;
     };
+
+    if (!isFirebaseConfigured) {
+      setLoading(false);
+      return;
+    }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       stopSnapshots();
