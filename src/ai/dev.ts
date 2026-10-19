@@ -13,3 +13,4 @@ import '@/ai/flows/text-correction-flow.ts';
 import '@/ai/flows/article-generation-flow.ts';
 import '@/ai/flows/organization-insights-flow.ts';
 import '@/ai/flows/report-triage-flow.ts';
+import '@/ai/flows/crisis-chat-flow.ts';

@@ -33,7 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Check, Copy,
-  ExternalLink, Loader2, Phone, Shield, LogOut,
+  ExternalLink, Loader2, Phone, Shield, LogOut, MapPin,
 } from 'lucide-react';
 import { submitReport, type SubmitReportResult } from '@/app/actions/report';
 import { NIGERIA_STATES, SUPPORT_ORGS, type IncidentType } from '@/lib/report-orgs';
@@ -44,6 +44,7 @@ import { ReportChatBox } from '@/components/report-chat';
 import { EvidenceNotes } from '@/components/evidence-notes';
 import { SafetyPlan } from '@/components/safety-plan';
 import { WellbeingCheckIn } from '@/components/report-wellbeing';
+import { NearestHelpFinder } from '@/components/nearest-help-finder';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -359,9 +360,9 @@ function StepReview({ form }: { form: FormState }) {
   );
 }
 
-function StepConfirmation({ caseId, triageSummary, urgency, referredOrgs, keyNeeds, safetyRisk }: {
+function StepConfirmation({ caseId, triageSummary, urgency, referredOrgs, keyNeeds, safetyRisk, stateCode }: {
   caseId: string; triageSummary: string; urgency: string; referredOrgs: ReferredOrg[];
-  keyNeeds: string[]; safetyRisk: boolean;
+  keyNeeds: string[]; safetyRisk: boolean; stateCode?: string | null;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -480,6 +481,22 @@ function StepConfirmation({ caseId, triageSummary, urgency, referredOrgs, keyNee
           </div>
         </div>
       )}
+
+      {/* Nearest Emergency Apparatus & Points of Help (Police, Ministries, SARCs) */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-primary" />
+          <p className="font-semibold text-sm">Immediate in-person help near you</p>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Locate nearest police gender desks, sexual assault referral centres (SARCs), and Ministry of Women Affairs offices.
+        </p>
+        <NearestHelpFinder
+          defaultStateCode={stateCode}
+          showTitle={false}
+          className="rounded-xl border bg-card/60 p-4"
+        />
+      </div>
 
       {/* Chat box */}
       <ReportChatBox caseId={caseId} />
@@ -621,6 +638,7 @@ export function ReportForm() {
               referredOrgs={result.referredOrgs}
               keyNeeds={result.keyNeeds}
               safetyRisk={result.safetyRisk}
+              stateCode={result.stateCode ?? form.stateCode}
             />
           )}
         </motion.div>

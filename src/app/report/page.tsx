@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
-import { Shield, Phone, BookOpen, BarChart2, ExternalLink } from 'lucide-react';
+import { Shield, Phone, BookOpen, BarChart2, ExternalLink, MapPin, AlertCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ReportForm } from '@/components/report-form';
 import { CaseLookup } from '@/components/case-lookup';
 import { ReportStats } from '@/components/report-stats';
+import { NearestHelpFinder } from '@/components/nearest-help-finder';
+import { QuickExit } from '@/components/quick-exit';
 import { SUPPORT_ORGS } from '@/lib/report-orgs';
 
 export const metadata: Metadata = {
@@ -18,7 +20,10 @@ const EMERGENCY_ORGS = SUPPORT_ORGS.filter((o) => o.emergency24h);
 
 export default function ReportPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Floating Panic Button */}
+      <QuickExit />
+
       {/* Hero */}
       <div className="border-b bg-card">
         <div className="mx-auto max-w-3xl px-4 py-10 text-center space-y-3">
@@ -30,6 +35,12 @@ export default function ReportPage() {
             A safe, confidential space to report sexual and gender-based violence.
             You can stay completely anonymous. We will connect you with the right support.
           </p>
+          <div className="pt-2">
+            <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 border border-border px-3 py-1.5 rounded-full">
+              <AlertCircle className="h-3.5 w-3.5 text-primary" />
+              <span>Ventaya is an encrypted triage lifeline. For armed police emergency dispatch, dial 112 directly.</span>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -54,25 +65,32 @@ export default function ReportPage() {
       </div>
 
       {/* Main content */}
-      <div className="mx-auto max-w-3xl px-4 py-10">
+      <div className="mx-auto max-w-4xl px-4 py-10">
         <Tabs defaultValue="report">
-          <TabsList className="w-full mb-8 grid grid-cols-4">
-            <TabsTrigger value="report" className="gap-1.5">
-              <Shield className="h-4 w-4" /><span className="hidden sm:inline">Make a report</span><span className="sm:hidden">Report</span>
+          <TabsList className="w-full mb-8 grid grid-cols-2 sm:grid-cols-5 h-auto p-1 gap-1">
+            <TabsTrigger value="report" className="gap-1.5 py-2">
+              <Shield className="h-4 w-4" /><span>Report</span>
             </TabsTrigger>
-            <TabsTrigger value="lookup" className="gap-1.5">
-              <BookOpen className="h-4 w-4" /><span className="hidden sm:inline">Check status</span><span className="sm:hidden">Status</span>
+            <TabsTrigger value="nearest" className="gap-1.5 py-2">
+              <MapPin className="h-4 w-4" /><span>Nearest help</span>
             </TabsTrigger>
-            <TabsTrigger value="resources" className="gap-1.5">
-              <Phone className="h-4 w-4" /><span className="hidden sm:inline">Helplines</span><span className="sm:hidden">Help</span>
+            <TabsTrigger value="lookup" className="gap-1.5 py-2">
+              <BookOpen className="h-4 w-4" /><span>Case status</span>
             </TabsTrigger>
-            <TabsTrigger value="stats" className="gap-1.5">
-              <BarChart2 className="h-4 w-4" /><span className="hidden sm:inline">Statistics</span><span className="sm:hidden">Stats</span>
+            <TabsTrigger value="resources" className="gap-1.5 py-2">
+              <Phone className="h-4 w-4" /><span>Directory</span>
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="gap-1.5 py-2 col-span-2 sm:col-span-1">
+              <BarChart2 className="h-4 w-4" /><span>Impact stats</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="report">
             <ReportForm />
+          </TabsContent>
+
+          <TabsContent value="nearest">
+            <NearestHelpFinder showTitle={true} />
           </TabsContent>
 
           <TabsContent value="lookup">

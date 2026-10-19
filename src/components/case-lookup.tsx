@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, Phone, ExternalLink, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Search, Phone, ExternalLink, Clock, CheckCircle2, AlertCircle, MapPin } from 'lucide-react';
 import { lookupReport } from '@/app/actions/report';
 import { SUPPORT_ORGS } from '@/lib/report-orgs';
 import type { PublicReport } from '@/lib/report';
@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { ReportChatBox } from '@/components/report-chat';
 import { EvidenceNotes } from '@/components/evidence-notes';
 import { SafetyPlan } from '@/components/safety-plan';
+import { NearestHelpFinder } from '@/components/nearest-help-finder';
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   received:   { label: 'Received',     color: 'bg-muted text-muted-foreground',         icon: Clock },
@@ -176,6 +177,19 @@ export function CaseLookup() {
               })}
             </div>
           )}
+
+          {/* Emergency apparatus & points of help near user */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <p className="font-semibold text-sm">Emergency apparatus & points of help near you</p>
+            </div>
+            <NearestHelpFinder
+              defaultStateCode={report.location?.stateCode}
+              showTitle={false}
+              className="rounded-xl border bg-card/60 p-4"
+            />
+          </div>
 
           {/* Chat box: always shown when a valid report is loaded */}
           <ReportChatBox caseId={report.caseId} />

@@ -13,6 +13,8 @@ import { z } from 'zod';
 import { getAdmin } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { ChatMessage, ChatThread } from '@/lib/report-chat';
+import type { Report } from '@/lib/report';
+import { generateCrisisChatReply } from '@/ai/flows/crisis-chat-flow';
 
 // ── In-memory rate limit fallback (dev only) ──────────────────────────────
 const memLimit = new Map<string, { count: number; ts: number }>();
@@ -161,6 +163,78 @@ export async function sendChatMessage(input: {
   }
 
   await batch.commit();
+
+  // If message was sent by reporter, automatically generate trauma-informed Care AI response
+  if (sender === 'reporter') {
+    try {
+      const reportData = reportSnap.data() as Partial<Report>;
+
+      // Fetch last few messages for conversation context
+      const recentSnaps = await admin.db
+        .collection('report-chats')
+        .doc(caseId)
+        .collection('messages')
+        .orderBy('createdAtTs', 'desc')
+        .limit(6)
+        .get();
+
+      const history = recentSnaps.docs
+        .map((d) => d.data() as ChatMessage)
+        .reverse()
+        .map((m) => ({
+          sender: m.sender,
+          content: m.content,
+        }));
+
+      const aiReply = await generateCrisisChatReply({
+        caseId,
+        userMessage: content,
+        incidentType: reportData.incidentType,
+        urgency: reportData.urgency,
+        stateName: reportData.location?.stateName ?? undefined,
+        isRecent: reportData.isRecent,
+        history,
+      });
+
+      if (aiReply) {
+        const aiMessageRef = admin.db
+          .collection('report-chats')
+          .doc(caseId)
+          .collection('messages')
+          .doc();
+
+        const aiNow = new Date().toISOString();
+        const aiMessage: ChatMessage = {
+          id: aiMessageRef.id,
+          caseId,
+          sender: 'support',
+          senderLabel: 'Ventaya Care AI',
+          content: aiReply,
+          createdAt: aiNow,
+          read: false,
+        };
+
+        await aiMessageRef.set({
+          ...aiMessage,
+          createdAtTs: FieldValue.serverTimestamp(),
+        });
+
+        await threadRef.set(
+          {
+            lastMessageAt: aiNow,
+            lastMessagePreview: aiReply.slice(0, 80),
+            reporterUnread: FieldValue.increment(1),
+            supportJoined: true,
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
+    } catch (aiErr) {
+      console.error('[SafeReport Chat] Care AI generation failed:', aiErr);
+    }
+  }
+
   return { ok: true, message };
 }
 

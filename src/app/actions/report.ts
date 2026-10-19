@@ -62,6 +62,7 @@ export type SubmitReportResult =
       referredOrgs: ReferredOrg[];
       keyNeeds: string[];
       safetyRisk: boolean;
+      stateCode?: string | null;
     }
   | { ok: false; error: string; code: 'validation' | 'rate_limit' | 'failed' };
 
@@ -274,6 +275,7 @@ export async function submitReport(
       referredOrgs,
       keyNeeds: triage.keyNeeds,
       safetyRisk: triage.safetyRisk,
+      stateCode: data.stateCode ?? null,
     };
   } catch (err) {
     console.error('[SafeReport] submitReport failed:', err);
